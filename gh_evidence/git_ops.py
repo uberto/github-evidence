@@ -156,18 +156,19 @@ def expand_commit(repo_root: Path, sha: str) -> CommitInfo:
     )
     lines = [l.strip() for l in meta_out.strip().split("\n")]
     subject = lines[0] if lines else ""
-    body = "\n".join(lines[1:-5]).strip() if len(lines) >= 6 else ""
-    author = lines[-5] if len(lines) >= 6 else ""
-    committer = lines[-3] if len(lines) >= 6 else ""
+    # Format: subject, body..., author, author_date, committer, committer_date (last 4)
+    body = "\n".join(lines[1:-4]).strip() if len(lines) >= 4 else ""
+    author = lines[-4] if len(lines) >= 4 else ""
+    committer = lines[-2] if len(lines) >= 4 else ""
     author_date = datetime.now()
     committer_date = author_date
-    if len(lines) >= 6:
+    if len(lines) >= 4:
         try:
-            author_date = datetime.strptime(lines[-4][:19], "%Y-%m-%d %H:%M:%S")
+            author_date = datetime.strptime(lines[-3][:19], "%Y-%m-%d %H:%M:%S")
         except (ValueError, IndexError):
             pass
         try:
-            committer_date = datetime.strptime(lines[-2][:19], "%Y-%m-%d %H:%M:%S")
+            committer_date = datetime.strptime(lines[-1][:19], "%Y-%m-%d %H:%M:%S")
         except (ValueError, IndexError):
             committer_date = author_date
 

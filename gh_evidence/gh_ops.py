@@ -30,13 +30,16 @@ class PRInfo:
 
 def run_gh(args: list[str], cwd: Path) -> tuple[str, str, int]:
     """Run gh command, return (stdout, stderr, returncode)."""
-    result = subprocess.run(
-        ["gh"] + args,
-        cwd=cwd,
-        capture_output=True,
-        text=True,
-    )
-    return result.stdout, result.stderr, result.returncode
+    try:
+        result = subprocess.run(
+            ["gh"] + args,
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+        )
+        return result.stdout, result.stderr, result.returncode
+    except FileNotFoundError:
+        return "", "gh CLI not found. Install from https://cli.github.com/", 127
 
 
 def get_repo_owner_name(repo_root: Path) -> Optional[tuple[str, str]]:
